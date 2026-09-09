@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فێربوونی پیتەکانی عەرەبی</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            background-color: #e74c3c;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .letter-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        .letter-btn:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+
+        .harakat-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        select {
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .harakat-buttons button {
+            font-size: 1.1rem;
+            padding: 8px 12px;
+            margin: 2px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .harakat-buttons button:hover {
+            background-color: #27ae60;
+        }
+
+        .display-box {
+            font-size: 4rem;
+            text-align: center;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .status-msg {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>فێربوونی پیت و حەرەکاتی عەرەبی</h1>
+    </header>
+
+    <main class="container">
+        <section class="card">
+            <h2>١. ژمارەی پیتەکانی عەرەبی</h2>
+            <p>زمانی عەرەبی پێکهاتووە لە <span id="letter-count" class="badge">0</span> پیتی سەرەکی.</p>
+        </section>
+
+        <section class="card">
+            <h2>٢. گوێگرتن لە دەنگی پیتەکان</h2>
+            <p>لە سەر هەر پیتێک بدە بۆ ئەوەی گوێت لە دەنگەکەی بێت:</p>
+            <div id="alphabet-grid" class="grid-container"></div>
+            <div id="voice-status" class="status-msg"></div>
+        </section>
+
+        <section class="card">
+            <h2>٣. ڕاهێنانی حەرەکەکان</h2>
+            <div class="harakat-controls">
+                <select id="letter-select"></select>
+                <div class="harakat-buttons">
+                    <button onclick="speakHarakah('َ')">فەتحە ( َ )</button>
+                    <button onclick="speakHarakah('ُ')">زەمە ( ُ )</button>
+                    <button onclick="speakHarakah('ِ')">کەسڕە ( ِ )</button>
+                    <button onclick="speakHarakah('ْ')">سوکون ( ْ )</button>
+                </div>
+            </div>
+            <div class="display-box" id="harakah-display">أ</div>
+        </section>
+    </main>
+
+    <script>
+        const arabicAlphabet = [
+            'أ', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 
+            'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 
+            'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 
+            'ك', 'ل', 'م', 'ن', 'هـ', 'و', 'ي'
+        ];
+
+        document.getElementById('letter-count').innerText = arabicAlphabet.length;
+
+        const grid = document.getElementById('alphabet-grid');
+        const select = document.getElementById('letter-select');
+        const statusDiv = document.getElementById('voice-status');
+
+        arabicAlphabet.forEach(letter => {
+            const btn = document.createElement('button');
+            btn.className = 'letter-btn';
+            btn.innerText = letter;
+            btn.onclick = () => playSound(letter);
+            grid.appendChild(btn);
+
+            const option = document.createElement('option');
+            option.value = letter;
+            option.innerText = letter;
+            select.appendChild(option);
+        });
+
+        let availableVoices = [];
+        let selectedArabicVoice = null;
+
+        function loadVoices() {
+            availableVoices = window.speechSynthesis.getVoices();
+            // Find an Arabic voice available in Chrome/Windows
+            selectedArabicVoice = availableVoices.find(voice => voice.lang.startsWith('ar'));
+            
+            if (!selectedArabicVoice && availableVoices.length > 0) {
+                statusDiv.innerText = "Warning: No Arabic speech voice found on your system. Please install Arabic in Windows settings.";
+                statusDiv.style.color = "#e74c3c";
+            } else if (selectedArabicVoice) {
+                statusDiv.innerText = `Voice loaded: ${selectedArabicVoice.name}`;
+                statusDiv.style.color = "#27ae60";
+            }
+        }
+
+        // Chrome loads voices asynchronously
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+        loadVoices();
+
+        function playSound(text) {
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA';
+            utterance.rate = 0.8;
+
+            if (selectedArabicVoice) {
+                utterance.voice = selectedArabicVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function speakHarakah(harakah) {
+            const selectedLetter = select.value;
+            const combinedText = selectedLetter + harakah;
+            
+            document.getElementById('harakah-display').innerText = combinedText;
+            playSound(combinedText);
+        }
+    </script>
+</body>
+</html>
