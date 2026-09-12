@@ -110,7 +110,37 @@
     </style>
 </head>
 <body>
+<!-- دوگمە و پەنجەرەی ڕێکخستنەکان -->
+<button id="settingsBtn" style="padding: 8px 15px; cursor: pointer; border: none; border-radius: 5px; background-color: #007bff; color: white; font-size: 16px;">⚙️ ڕێکخستنەکان</button>
 
+<div id="settingsModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+    <div style="background-color: #ffffff; margin: 10% auto; padding: 20px; width: 320px; border-radius: 8px; position: relative;">
+        <span class="close-btn" style="position: absolute; left: 15px; top: 10px; font-size: 24px; cursor: pointer;">&times;</span>
+        <h2 id="modalTitle">ڕێکخستنەکانی بەرنامە</h2>
+        
+        <div style="margin-top: 15px;">
+            <label id="langLabel" style="display: block; margin-bottom: 5px; font-weight: bold;">زمان (Language):</label>
+            <select id="langSelect" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+                <option value="ku">کوردی</option>
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <label id="themeLabel" style="display: block; margin-bottom: 5px; font-weight: bold;">دۆخی ڕوکار (Theme):</label>
+            <div style="display: flex; gap: 10px;">
+                <button id="lightModeBtn" style="flex: 1; padding: 8px; cursor: pointer; border: 1px solid #ccc; border-radius: 5px;">☀️ ڕووناک</button>
+                <button id="darkModeBtn" style="flex: 1; padding: 8px; cursor: pointer; border: 1px solid #ccc; border-radius: 5px;">🌙 تاریک</button>
+            </div>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <label id="colorLabel" style="display: block; margin-bottom: 5px; font-weight: bold;">ڕەنگی پشتەوە (Background Color):</label>
+            <input type="color" id="bgColorPicker" value="#ffffff" style="width: 100%; padding: 4px; height: 35px; border-radius: 5px; border: 1px solid #ccc;">
+        </div>
+    </div>
+</div>
     <header>
         <h1>فێربوونی پیت و حەرەکاتی عەرەبی</h1>
     </header>
@@ -211,7 +241,82 @@
             
             document.getElementById('harakah-display').innerText = combinedText;
             playSound(combinedText);
+const modal = document.getElementById("settingsModal");
+    const btn = document.getElementById("settingsBtn");
+    const span = document.getElementsByClassName("close-btn")[0];
+    const lightBtn = document.getElementById("lightModeBtn");
+    const darkBtn = document.getElementById("darkModeBtn");
+    const langSelect = document.getElementById("langSelect");
+    const bgColorPicker = document.getElementById("bgColorPicker");
+
+    btn.onclick = () => modal.style.display = "block";
+    span.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
+
+    lightBtn.onclick = () => {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+    };
+
+    darkBtn.onclick = () => {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+    };
+
+    bgColorPicker.oninput = (e) => {
+        const selectedColor = e.target.value;
+        document.body.style.backgroundColor = selectedColor;
+        localStorage.setItem('bgColor', selectedColor);
+    };
+
+    langSelect.onchange = (e) => {
+        const lang = e.target.value;
+        localStorage.setItem('lang', lang);
+        updateLanguage(lang);
+    };
+
+    function updateLanguage(lang) {
+        if (lang === 'en') {
+            btn.innerText = "⚙️ Settings";
+            document.getElementById("modalTitle").innerText = "App Settings";
+            document.getElementById("langLabel").innerText = "Language:";
+            document.getElementById("themeLabel").innerText = "Theme Mode:";
+            document.getElementById("colorLabel").innerText = "Background Color:";
+            lightBtn.innerText = "☀️ Light";
+            darkBtn.innerText = "🌙 Dark";
+        } else if (lang === 'ar') {
+            btn.innerText = "⚙️ Settings";
+            document.getElementById("modalTitle").innerText = "إعدادات التطبيق";
+            document.getElementById("langLabel").innerText = "اللغة (Language):";
+            document.getElementById("themeLabel").innerText = "وضع المظهر (Theme):";
+            document.getElementById("colorLabel").innerText = "لون الخلفية (Background Color):";
+            lightBtn.innerText = "☀️ فاتح";
+            darkBtn.innerText = "🌙 داكن";
+        } else {
+            btn.innerText = "⚙️ ڕێکخستنەکان";
+            document.getElementById("modalTitle").innerText = "ڕێکخستنەکانی بەرنامە";
+            document.getElementById("langLabel").innerText = "زمان (Language):";
+            document.getElementById("themeLabel").innerText = "دۆخی ڕوکار (Theme):";
+            document.getElementById("colorLabel").innerText = "ڕەنگی پشتەوە (Background Color):";
+            lightBtn.innerText = "☀️ ڕووناک";
+            darkBtn.innerText = "🌙 تاریک";
         }
+    }
+
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        const savedColor = localStorage.getItem('bgColor');
+        if (savedColor) {
+            document.body.style.backgroundColor = savedColor;
+            bgColorPicker.value = savedColor;
+        }
+
+        const savedLang = localStorage.getItem('lang') || 'ku';
+        langSelect.value = savedLang;
+        updateLanguage(savedLang);
+    };        }
     </script>
 </body>
 </html>
