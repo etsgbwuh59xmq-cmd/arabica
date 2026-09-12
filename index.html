@@ -420,6 +420,102 @@ const modal = document.getElementById("settingsModal");
             langSelect.value = savedLang;
         }
         updateLanguage(savedLang);
-    };    </script>
+   const modal = document.getElementById("settingsModal");
+    const btn = document.getElementById("settingsBtn");
+    const span = document.querySelector(".close-btn");
+    const lightBtn = document.getElementById("lightModeBtn");
+    const darkBtn = document.getElementById("darkModeBtn");
+    const langSelect = document.getElementById("langSelect");
+    const bgColorPicker = document.getElementById("bgColorPicker");
+
+    if (btn && modal) {
+        btn.onclick = () => { modal.style.display = "block"; };
+    }
+    if (span && modal) {
+        span.onclick = () => { modal.style.display = "none"; };
+    }
+    window.onclick = (e) => { 
+        if (e.target == modal) { modal.style.display = "none"; } 
+    }
+
+    if (lightBtn) {
+        lightBtn.onclick = () => {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        };
+    }
+
+    if (darkBtn) {
+        darkBtn.onclick = () => {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        };
+    }
+
+    if (bgColorPicker) {
+        bgColorPicker.oninput = (e) => {
+            const selectedColor = e.target.value;
+            document.documentElement.style.setProperty('--bg-color', selectedColor);
+            localStorage.setItem('bgColor', selectedColor);
+        };
+    }
+
+    if (langSelect) {
+        langSelect.onchange = (e) => {
+            const lang = e.target.value;
+            localStorage.setItem('lang', lang);
+            updateLanguage(lang);
+        };
+    }
+
+    function updateLanguage(lang) {
+        const modalTitle = document.getElementById("modalTitle");
+        const langLabel = document.getElementById("langLabel");
+        const themeLabel = document.getElementById("themeLabel");
+        const colorLabel = document.getElementById("colorLabel");
+
+        if (lang === 'en') {
+            if (btn) btn.innerText = "⚙️ Settings";
+            if (modalTitle) modalTitle.innerText = "App Settings";
+            if (langLabel) langLabel.innerText = "Language:";
+            if (themeLabel) themeLabel.innerText = "Theme Mode:";
+            if (colorLabel) colorLabel.innerText = "Background Color:";
+            if (lightBtn) lightBtn.innerText = "☀️ Light";
+            if (darkBtn) darkBtn.innerText = "🌙 Dark";
+        } else if (lang === 'ar') {
+            if (btn) btn.innerText = "⚙️ الإعدادات";
+            if (modalTitle) modalTitle.innerText = "إعدادات التطبيق";
+            if (langLabel) langLabel.innerText = "اللغة (Language):";
+            if (themeLabel) themeLabel.innerText = "وضع المظهر (Theme):";
+            if (colorLabel) colorLabel.innerText = "لون الخلفية (Background Color):";
+            if (lightBtn) lightBtn.innerText = "☀️ فاتح";
+            if (darkBtn) darkBtn.innerText = "🌙 داكن";
+        } else {
+            if (btn) btn.innerText = "⚙️ ڕێکخستنەکان";
+            if (modalTitle) modalTitle.innerText = "ڕێکخستنەکانی بەرنامە";
+            if (langLabel) langLabel.innerText = "زمان (Language):";
+            if (themeLabel) themeLabel.innerText = "دۆخی ڕوکار (Theme):";
+            if (colorLabel) colorLabel.innerText = "ڕەنگی پشتەوە (Background Color):";
+            if (lightBtn) lightBtn.innerText = "☀️ ڕووناک";
+            if (darkBtn) darkBtn.innerText = "🌙 تاریک";
+        }
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    const savedColor = localStorage.getItem('bgColor');
+    if (savedColor && bgColorPicker) {
+        document.documentElement.style.setProperty('--bg-color', savedColor);
+        bgColorPicker.value = savedColor;
+    }
+
+    const savedLang = localStorage.getItem('lang') || 'ku';
+    if (langSelect) {
+        langSelect.value = savedLang;
+    }
+    updateLanguage(savedLang); };    </script>
 </body>
 </html>
