@@ -516,6 +516,78 @@ const modal = document.getElementById("settingsModal");
     if (langSelect) {
         langSelect.value = savedLang;
     }
-    updateLanguage(savedLang); };    </script>
+    updateLanguage(savedLang); };  // کۆنتڕۆڵی دارک مۆد و ڕووناک
+    if (lightBtn) {
+        lightBtn.onclick = () => {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+        };
+    }
+
+    if (darkBtn) {
+        darkBtn.onclick = () => {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        };
+    }
+
+    // زیادکردنی خانەی دووەم بۆ ڕەنگی پیت و نووسینەکان لە سێتینگدا
+    const modalContent = document.querySelector('.modal-content');
+    if (modalContent && !document.getElementById('textColorPicker')) {
+        const textColorDiv = document.createElement('div');
+        textColorDiv.style.marginTop = "15px";
+        textColorDiv.innerHTML = `
+            <label id="textColorLabel" style="display: block; margin-bottom: 5px; font-weight: bold;">ڕەنگی پیت و نووسین (Text Color):</label>
+            <input type="color" id="textColorPicker" value="#333333" style="width: 100%; padding: 4px; height: 35px; border-radius: 5px; border: 1px solid #ccc; cursor: pointer;">
+        `;
+        modalContent.appendChild(textColorDiv);
+    }
+
+    // کۆنتڕۆڵی هەڵبژاردنی ڕەنگی پشتەوە و ڕەنگی پیتەکان
+    const textColorPicker = document.getElementById("textColorPicker");
+
+    if (bgColorPicker) {
+        bgColorPicker.oninput = (e) => {
+            const selectedColor = e.target.value;
+            document.documentElement.style.setProperty('--bg-color', selectedColor);
+            localStorage.setItem('bgColor', selectedColor);
+        };
+    }
+
+    if (textColorPicker) {
+        textColorPicker.oninput = (e) => {
+            const selectedTextColor = e.target.value;
+            document.documentElement.style.setProperty('--text-color', selectedTextColor);
+            localStorage.setItem('textColor', selectedTextColor);
+        };
+    }
+
+    // گەڕاندنەوەی ڕەنگە سەیفکراوەکان لە کاتی کردنەوەی پەڕەکەدا
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+
+        const savedColor = localStorage.getItem('bgColor');
+        if (savedColor && bgColorPicker) {
+            document.documentElement.style.setProperty('--bg-color', savedColor);
+            bgColorPicker.value = savedColor;
+        }
+
+        const savedTextColor = localStorage.getItem('textColor');
+        if (savedTextColor && textColorPicker) {
+            document.documentElement.style.setProperty('--text-color', savedTextColor);
+            textColorPicker.value = savedTextColor;
+        }
+
+        const savedLang = localStorage.getItem('lang') || 'ku';
+        if (langSelect) {
+            langSelect.value = savedLang;
+        }
+        if (typeof updateLanguage === 'function') {
+            updateLanguage(savedLang);
+        }
+    };  </script>
 </body>
 </html>
