@@ -303,7 +303,11 @@ const modal = document.getElementById("settingsModal");
         }
     }
 
-    window.onload = () => {
+    window.onload = () => {const modal = document.getElementById("settingsModal");
+    const btn = document.getElementById("settingsBtn");
+    if (btn && modal) {
+        btn.onclick = () => { modal.style.display = "block"; };
+    }
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
 
